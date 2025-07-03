@@ -1,0 +1,98 @@
+From 4bda021e3a93d0c3a920dab3cffb8aaa87056dae Mon Sep 17 00:00:00 2001
+From: Michael Weiser <michael.weiser@eviden.com>
+Date: Tue, 27 May 2025 11:53:14 +0200
+Subject: [PATCH 5/6] Add EF parameters
+
+---
+ templates/openpbs.txt | 68 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
+
+diff --git a/templates/openpbs.txt b/templates/openpbs.txt
+index fd075b7..53883fe 100644
+--- a/templates/openpbs.txt
++++ b/templates/openpbs.txt
+@@ -55,6 +55,16 @@ Autoscale = $Autoscale
+         ssh.host_key.ed25519.private=$ssh_host_key_ed25519_private
+         ssh.host_key.ed25519.public=$ssh_host_key_ed25519_public
+ 
++        ef.install = $ef_install_portal_dcv
++        ef.license = $ef_license
++        ef.admin_password = $ef_admin_password
++        ef.limit_execute_skus = $ef_limit_execute_skus
++        ef.server_pkcs12_password = $ef_server_pkcs12_password
++        ef.server_pkcs12_file = $ef_server_pkcs12_file
++        ef.dcv_pkcs12_password = $ef_dcv_pkcs12_password
++        ef.dcv_pkcs12_file = $ef_dcv_pkcs12_file
++        ef.dcv_license = $ef_dcv_license
++
+         # For fast spin-up after Deallocate, force an immediate re-converge on boot
+         cyclecloud.converge_on_boot = true
+ 
+@@ -692,6 +702,64 @@ Order = 20
+         Config.MaxValue = 10000
+         Config.IntegerOnly = true
+ 	
++        [[[parameter ef_install_portal_dcv]]]
++        Label = Install EF Portal/DCV
++        Description = Install EF Portal on headnode and DCV on compute
++        ParameterType = Boolean
++        DefaultValue = true
++
++        [[[parameter ef_license]]]
++        Label = EF Portal License
++        Description = base64-encoded license file for EF Portal
++        ParameterType = Text
++        Required = True
++        Conditions.Excluded := ef_install_portal_dcv != true
++
++        [[[parameter ef_admin_password]]]
++        Label = EF Portal admin password
++        Description = EF Portal administrator password
++        Required = True
++        ParameterType = Password
++        Conditions.Excluded := ef_install_portal_dcv != true
++
++        [[[parameter ef_limit_execute_skus]]]
++        Label = DCV Execute SKUs
++        Description = Install DCV only on selected execute nodes
++        ParameterType = Cloud.MachineType
++        Config.Multiselect = true
++        Conditions.Excluded := ef_install_portal_dcv != true
++
++        [[[parameter ef_server_pkcs12_file]]]
++        Label = Server PKCS12 file
++        Description = PKCS12 file containing server TLS private key and certificate with name ef
++        ParameterType = Text
++        Conditions.Excluded := ef_install_portal_dcv != true
++
++        [[[parameter ef_server_pkcs12_password]]]
++        Label = Server PKCS12 password
++        Description = Password of server PKCS12 file
++        ParameterType = Password
++        Cef_server_pkcs12_fileonditions.Excluded := ef_install_portal_dcv != true
++
++        [[[parameter ef_dcv_pkcs12_file]]]
++        Label = DCV PKCS12 file
++        Description = PKCS12 file containing DCV TLS private key and certificate
++        ParameterType = Text
++        Conditions.Excluded := ef_install_portal_dcv != true
++
++        [[[parameter ef_dcv_pkcs12_password]]]
++        Label = DCV PKCS12 password
++        Description = Password of DCV PKCS12 file
++        ParameterType = Password
++        Cef_server_pkcs12_fileonditions.Excluded := ef_install_portal_dcv != true
++
++        [[[parameter ef_dcv_license]]]
++        Label = DCV License
++        Description = base64-encoded license file for DCV RLM server
++        ParameterType = Text
++        Required = True
++        Conditions.Excluded := ef_install_portal_dcv != true
++
+ 
+     [[parameters Advanced Networking]]
+ 
+-- 
+2.47.2
+
